@@ -1,0 +1,1 @@
+# Simple checkers game with AI
