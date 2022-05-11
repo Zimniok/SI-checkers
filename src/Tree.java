@@ -20,10 +20,22 @@ public class Tree<T> {
         public T data;
         private Node<T> parent;
         private List<Node<T>> children;
+
+        public Node(){
+            this.children = new ArrayList<>();
+        }
+
+        public void addChild(Node<T> child){
+            this.children.add(child);
+            child.parent = this;
+        }
+        public List<Node<T>> getChildren() { return this.children; }
+        public Node<T> getParent() { return this.parent; }
     }
 
     public void addChild(Node<T> child){
         root.children.add(child);
+        child.parent = root;
     }
 
     public Node<T> getNode(){

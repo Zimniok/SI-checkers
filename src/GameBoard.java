@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class GameBoard {
-    public int WHITE_WIN = 1;
-    public int BLACK_WIN = -1;
+    public static int WHITE_WIN = 1;
+    public static int BLACK_WIN = -1;
     public int GAME_IN_PROGRESS = 0;
-    public int STALEMATE = 2;
+    public static int STALEMATE = 2;
 
     private ArrayList<GamePiece> gamePieces = new ArrayList<>();
     private int currentMove;
@@ -16,6 +16,7 @@ public class GameBoard {
     private int availableMovesCount;
     private ArrayList<Tree<Pair<Integer, Integer>>> availableCaptures;
     private int kingMoves = 0;
+    private double evaluation;
 
     public GameBoard(){
         this.availableCaptures = new ArrayList<>();
@@ -24,6 +25,20 @@ public class GameBoard {
         this.generateWhitePieces();
         //gamePieces.add(new GamePiece(3, 6, GamePiece.WHITE, GamePiece.KING));
         this.generateBlackPieces();
+
+        this.calculateAvailableCaptures(null);
+        if (this.availableCapturesCount == 0)
+            this.calculateAvailableMoves();
+        System.out.println(this.evaluate());
+    }
+
+    public GameBoard(GameBoard gameBoard){
+        this.availableCaptures = new ArrayList<>();
+        this.currentMove = gameBoard.currentMove;
+        this.gamePieces = new ArrayList<>();
+        for(GamePiece gamePiece: gameBoard.gamePieces){
+            this.gamePieces.add(new GamePiece(gamePiece));
+        }
 
         this.calculateAvailableCaptures(null);
         if (this.availableCapturesCount == 0)
@@ -102,6 +117,8 @@ public class GameBoard {
         } else if(gameState == STALEMATE) {
             System.out.println("Stalemate");
         }
+
+        System.out.println(this.evaluate());
     }
 
     private void calculateAvailableCaptures(GamePiece piece) {
@@ -327,6 +344,10 @@ public class GameBoard {
         this.gamePieces.remove(piece);
     }
 
+    public ArrayList<GamePiece> getGamePieces() {
+        return gamePieces;
+    }
+
     private boolean isWithinBoard(int x, int y){
         if(x >= 0 && x < 8 && y >= 0 && y<8)
             return true;
@@ -341,7 +362,15 @@ public class GameBoard {
         return currentMove%2;
     }
 
-    private int checkGameState(){
+    public double getEvaluation() {
+        return evaluation;
+    }
+
+    public int getAvailableCapturesCount() {
+        return availableCapturesCount;
+    }
+
+    public int checkGameState(){
         int white_men_count = 0;
         int white_king_count = 0;
         int black_men_count = 0;
@@ -355,7 +384,7 @@ public class GameBoard {
                     white_king_count++;
             }
             else{
-                if(piece.getType() == GamePiece.KING)
+                if(piece.getType() == GamePiece.MAN)
                     black_men_count ++;
                 else
                     black_king_count ++;
@@ -377,5 +406,48 @@ public class GameBoard {
         if(this.kingMoves == 30)
             return STALEMATE;
         return GAME_IN_PROGRESS;
+    }
+
+    public double evaluate(){
+        double score = 0.0;
+
+        for (GamePiece piece: this.gamePieces){
+            if(piece.getColor() == GamePiece.WHITE) {
+                if(piece.getType() == GamePiece.MAN) {
+                    score++;
+                    score += (7-piece.getPosY())/10.0;
+                }
+                else {
+                    score += 3;
+                }
+
+
+                if (piece.getPosX() > 1 && piece.getPosX() < 6){
+                    score += (7-piece.getPosY())/5.0;
+                } else if (piece.getPosX() > 0 && piece.getPosX() < 7){
+                    score += (7-piece.getPosY())/10.0;
+                }
+            }
+            else {
+                if (piece.getType() == GamePiece.MAN) {
+                    score--;
+                    score -= piece.getPosY()/10.0;
+                }
+                else {
+                    score -= 3;
+                }
+
+
+                if (piece.getPosX() > 1 && piece.getPosX() < 6){
+                    score -= piece.getPosY()/5.0;
+                } else if (piece.getPosX() > 0 && piece.getPosX() < 7){
+                    score -= piece.getPosY()/10.0;
+                }
+            }
+            score = Math.round(score*10)/10.0;
+        }
+
+        this.evaluation = score;
+        return score;
     }
 }

@@ -53,6 +53,19 @@ public class GamePiece {
         }
     }
 
+    public GamePiece(GamePiece gamePiece){
+        this.posX = gamePiece.posX;
+        this.posY = gamePiece.posY;
+        this.color = gamePiece.color;
+        this.type = gamePiece.type;
+        this.availableMoves = new ArrayList<>();
+        this.image = gamePiece.image;
+
+        for (Pair<Integer, Integer> move: gamePiece.availableMoves){
+            this.availableMoves.add(new Pair<>(move.getKey(), move.getValue()));
+        }
+    }
+
     public int getPosX() {
         return posX;
     }
@@ -122,9 +135,13 @@ public class GamePiece {
     }
 
     public void upgrade(){
-        if(this.color == WHITE && this.posY == 0)
+        if(this.color == WHITE && this.posY == 0) {
             this.type = KING;
-        else if(this.color == BLACK && this.posY == 7)
+            this.image = WHITE_KING_IMG;
+        }
+        else if(this.color == BLACK && this.posY == 7) {
             this.type = KING;
+            this.image = BLACK_KING_IMG;
+        }
     }
 }

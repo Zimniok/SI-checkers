@@ -113,6 +113,7 @@ public class GameGui extends JFrame {
 
         JButton startButton = new JButton("Start");
         startButton.setBounds(320, 300, 200, 50);
+        GameGui temp = this;
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -120,6 +121,8 @@ public class GameGui extends JFrame {
                 resetWindow();
                 gameBoard = new GameBoard();
                 drawGame = true;
+
+                AIGui aiGui = new AIGui(temp);
             }
         });
         this.add(startButton);
