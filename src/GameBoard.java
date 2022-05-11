@@ -103,7 +103,7 @@ public class GameBoard {
                 this.calculateAvailableMoves();
         }
 
-        if(piece.getType() == GamePiece.KING){
+        if(piece !=null && piece.getType() == GamePiece.KING){
             this.kingMoves++;
         }
         else {
@@ -340,6 +340,27 @@ public class GameBoard {
         return null;
     }
 
+    public void capture(Pair<Integer, Integer> pos1, Pair<Integer, Integer> pos2, GamePiece piece){
+        int posX = pos1.getKey();
+        int posY = pos1.getValue();
+        int pos2X = pos2.getKey();
+        int pos2Y = pos2.getValue();
+        if (Math.abs(posX- pos2X) == 1 && piece.getType() == GamePiece.MAN)
+            this.afterMoveCalculations(piece);
+        else if(piece.getType() == GamePiece.MAN) {    // else: capture
+            this.capturePiece(this.getPiece((posX + pos2X)/2, (posY + pos2Y)/2));
+            this.afterMoveCalculations(piece);
+        } else {
+            GamePiece gamePieceCaptured = this.getPieceBetween(pos2X, pos2Y, posX, posY);
+            if (gamePieceCaptured!=null) {    //King capture
+                this.capturePiece(gamePieceCaptured);
+                this.afterMoveCalculations(piece);
+            } else {
+                this.afterMoveCalculations(piece);
+            }
+        }
+    }
+
     public void capturePiece(GamePiece piece){
         this.gamePieces.remove(piece);
     }
@@ -357,6 +378,8 @@ public class GameBoard {
     public int getCurrentMove() {
         return currentMove;
     }
+
+    public void subCurrentMove() { this.currentMove--; }
 
     public int getCurrentColorToMove(){
         return currentMove%2;
@@ -410,6 +433,11 @@ public class GameBoard {
 
     public double evaluate(){
         double score = 0.0;
+
+        if(checkGameState() == WHITE_WIN)
+            return Integer.MAX_VALUE;
+        if(checkGameState() == BLACK_WIN)
+            return Integer.MIN_VALUE;
 
         for (GamePiece piece: this.gamePieces){
             if(piece.getColor() == GamePiece.WHITE) {

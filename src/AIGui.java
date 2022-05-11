@@ -32,9 +32,10 @@ public class AIGui extends JFrame {
         makeMoveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GameBoard gameBoardToShow = Engine.startMinMax(gameGui.gameBoard, 2);
+                GameBoard gameBoardToShow = Engine.startMinMax(gameGui.gameBoard, 4);
                 gameGui.gameBoard = gameBoardToShow;
                 gameGui.repaint();
+                System.out.println(gameGui.gameBoard.getCurrentMove());
             }
         });
 

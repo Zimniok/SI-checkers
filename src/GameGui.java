@@ -75,6 +75,7 @@ public class GameGui extends JFrame {
                             }else
                                 selected = false;
                         }
+                        setTitle("Ruch: " + String.valueOf(gameBoard.getCurrentMove()));
                     }
                 }
                 repaint();

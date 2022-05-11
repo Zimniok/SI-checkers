@@ -13,6 +13,7 @@ public class Engine {
             if(child.data.getValue().equals(gameTree.getNode().data.getValue()))
                 return child.data.getKey();
         }
+
         return children.get(0).data.getKey();
     }
 
@@ -51,16 +52,22 @@ public class Engine {
                 for (Pair<Integer, Integer> move : gamePiece.getAvailableMoves()) {
                     GameBoard nextState = new GameBoard(node.data.getKey());
                     GamePiece nextStatePiece = nextState.getPiece(gamePiece.getPosX(), gamePiece.getPosY());
-                    if(node.data.getKey().getAvailableCapturesCount() > 0) {
-
-                    }
+                    Pair<Integer, Integer> beforeMovePos = new Pair<>(nextStatePiece.getPosX(), nextStatePiece.getPosY());
                     nextStatePiece.move(move.getKey(), move.getValue());
-                    nextState.afterMoveCalculations(nextStatePiece);
+                    if(node.data.getKey().getAvailableCapturesCount() > 0) {
+                        nextState.capture(beforeMovePos, move, nextStatePiece);
+                    }else {
+                        nextState.afterMoveCalculations(nextStatePiece);
+                    }
+//                    if(node.data.getKey().getAvailableCapturesCount() > 0) {
+//                        nextState.addCurrentMove();
+//                        nextState.afterMoveCalculations(null);
+//                    }
                     Tree.Node<Pair<GameBoard, Double>> child = new Tree.Node<>();
                     child.data = new Pair<GameBoard,Double>(nextState, null);
                     node.addChild(child);
                     int gameState = nextState.checkGameState();
-                    if(gameState == GameBoard.WHITE_WIN || gameState == GameBoard.BLACK_WIN || depth == 0) {
+                    if(gameState == GameBoard.WHITE_WIN || gameState == GameBoard.BLACK_WIN || gameState == GameBoard.STALEMATE || depth <= 0) {
                         child.data = new Pair<>(nextState, nextState.evaluate());
                         continue;
                     }
