@@ -127,7 +127,7 @@ public class GamePiece {
 
     public void drawAvailableMoves(Graphics g, int tileSize, int offsetX, int offsetY){
         int size = 20;
-        g.setColor(new Color(105, 130, 51));
+        g.setColor(new Color(5, 130, 2));
         for (int i = 0; i < this.availableMoves.size(); i++) {
             Pair<Integer, Integer> move = availableMoves.get(i);
             g.fillOval(move.getKey()*tileSize+offsetX+(tileSize/2)-(size/2), move.getValue()*tileSize+offsetY+(tileSize/2)-(size/2), size, size);
