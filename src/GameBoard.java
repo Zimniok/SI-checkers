@@ -87,8 +87,12 @@ public class GameBoard {
             for (int i = availableCaptures.size() - 1; i >= 0; i--) {
                 if (this.getPiece(availableCaptures.get(i).getNode().data.getKey(), availableCaptures.get(i).getNode().data.getValue()) == piece){
                     for(int j = 0; j < availableCaptures.get(i).getChildren().size(); j ++) {
-                        piece.addAvailableMove(availableCaptures.get(i).getChildren().get(j).data);
-                        availableCaptures.add(new Tree<>(availableCaptures.get(i).getChildren().get(j)));
+                        if (availableCaptures.get(i).getChildren().get(j).data.getKey() == piece.getPosX() && availableCaptures.get(i).getChildren().get(j).data.getValue() == piece.getPosY()){
+                            availableCaptures.remove(i);
+                        }else {
+                            piece.addAvailableMove(availableCaptures.get(i).getChildren().get(j).data);
+                            availableCaptures.add(new Tree<>(availableCaptures.get(i).getChildren().get(j)));
+                        }
                     }
                 }
 
@@ -343,6 +347,8 @@ public class GameBoard {
     }
 
     public GamePiece getPieceBetween(int posX1, int posY1, int posX2, int posY2){
+        if (posX2-posX1 == 0 || posY1 - posY2 == 0)
+            return null;
         Pair<Integer, Integer> vector = new Pair<>((posX2-posX1)/Math.abs(posX2-posX1), (posY2-posY1)/Math.abs(posY2-posY1));
         int tempX = posX1 + vector.getKey();
         int tempY = posY1 + vector.getValue();

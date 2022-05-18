@@ -15,10 +15,15 @@ public class GameController {
         if (gameBoard.getCurrentColorToMove() == GamePiece.WHITE && whiteAI != null){
             whiteAI.makeMove(gameBoard);
             gameGui.repaint();
+            if(gameBoard.checkGameState() != gameBoard.GAME_IN_PROGRESS)
+                return;
             this.makeMove();
         } else if (gameBoard.getCurrentColorToMove() == GamePiece.BLACK && blackAI != null){
             blackAI.makeMove(gameBoard);
             gameGui.repaint();
+            if(gameBoard.checkGameState() != gameBoard.GAME_IN_PROGRESS)
+                return;
+            System.out.println(gameBoard.checkGameState());
             this.makeMove();
         }
     }

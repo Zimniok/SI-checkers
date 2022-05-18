@@ -19,7 +19,7 @@ public class GameGui extends JFrame {
     GameBoard gameBoard;
     GameController gameController;
     AIPlayer whiteAI = new AIPlayer(AIPlayer.MINIMAX, 4, GamePiece.WHITE);
-    AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 2, GamePiece.BLACK);
+    AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 4, GamePiece.BLACK);
 
     JFrame f;
     GameGui(){
@@ -70,7 +70,7 @@ public class GameGui extends JFrame {
                                     gameBoard.afterMoveCalculations(piece);
                                 }
                             }
-                            if (gameController != null){
+                            if (gameController != null && gameBoard.checkGameState() != gameBoard.GAME_IN_PROGRESS){
                                 gameController.makeMove();
                             }
                         } else {
@@ -148,7 +148,6 @@ public class GameGui extends JFrame {
                 repaint(1);
 
                 gameController = new GameController(gameBoard, whiteAI, blackAI, temp);
-                gameController.makeMove();
             }
         });
         this.add(whiteAIConfig);
@@ -165,7 +164,6 @@ public class GameGui extends JFrame {
                 repaint();
 
                 gameController = new GameController(gameBoard, whiteAI, null, temp);
-                gameController.makeMove();
             }
         });
         this.add(ai_vs_player);
@@ -182,7 +180,6 @@ public class GameGui extends JFrame {
                 repaint();
 
                 gameController = new GameController(gameBoard, null, blackAI, temp);
-                gameController.makeMove();
             }
         });
         this.add(player_vs_ai);
@@ -217,6 +214,19 @@ public class GameGui extends JFrame {
         if (drawGame) {
             this.drawBoard(g);
             this.drawPieces(g);
+            int state = gameBoard.checkGameState();
+            if(gameController!=null && state == gameBoard.GAME_IN_PROGRESS)
+                gameController.makeMove();
+            if(state != gameBoard.GAME_IN_PROGRESS) {
+                String message = "";
+                if(state == GameBoard.WHITE_WIN)
+                    message = "White won!";
+                else if(state == GameBoard.BLACK_WIN)
+                    message = "Black won!";
+                else if(state == GameBoard.STALEMATE)
+                    message = "Stalemate!";
+                JOptionPane.showMessageDialog(null, message);
+            }
         }
     }
 }
