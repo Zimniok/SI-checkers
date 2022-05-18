@@ -17,6 +17,9 @@ public class GameGui extends JFrame {
     int offsetY = 45;
     int offsetX = 20;
     GameBoard gameBoard;
+    GameController gameController;
+    AIPlayer whiteAI = new AIPlayer(AIPlayer.MINIMAX, 4, GamePiece.WHITE);
+    AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 2, GamePiece.BLACK);
 
     JFrame f;
     GameGui(){
@@ -67,6 +70,9 @@ public class GameGui extends JFrame {
                                     gameBoard.afterMoveCalculations(piece);
                                 }
                             }
+                            if (gameController != null){
+                                gameController.makeMove();
+                            }
                         } else {
                             if (gameBoard.getPiece(posX, posY) != null){
                                 selectedX = posX;
@@ -111,6 +117,7 @@ public class GameGui extends JFrame {
 
     private void printMenu() {
         this.setTitle("Checkers Main Menu");
+        JPanel jPanel = new JPanel();
 
         JButton startButton = new JButton("Start");
         startButton.setBounds(320, 300, 200, 50);
@@ -122,11 +129,65 @@ public class GameGui extends JFrame {
                 resetWindow();
                 gameBoard = new GameBoard();
                 drawGame = true;
+                repaint();
 
                 AIGui aiGui = new AIGui(temp);
             }
         });
         this.add(startButton);
+
+        JButton whiteAIConfig = new JButton("AI vs AI");
+        whiteAIConfig.setBounds(320, 400, 200, 50);
+        whiteAIConfig.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setTitle("Checkers game");
+                resetWindow();
+                gameBoard = new GameBoard();
+                drawGame = true;
+                repaint(1);
+
+                gameController = new GameController(gameBoard, whiteAI, blackAI, temp);
+                gameController.makeMove();
+            }
+        });
+        this.add(whiteAIConfig);
+
+        JButton ai_vs_player = new JButton("AI vs Player");
+        ai_vs_player.setBounds(320, 500, 200, 50);
+        ai_vs_player.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setTitle("Checkers game");
+                resetWindow();
+                gameBoard = new GameBoard();
+                drawGame = true;
+                repaint();
+
+                gameController = new GameController(gameBoard, whiteAI, null, temp);
+                gameController.makeMove();
+            }
+        });
+        this.add(ai_vs_player);
+
+        JButton player_vs_ai = new JButton("Player vs AI");
+        player_vs_ai.setBounds(320, 600, 200, 50);
+        player_vs_ai.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setTitle("Checkers game");
+                resetWindow();
+                gameBoard = new GameBoard();
+                drawGame = true;
+                repaint();
+
+                gameController = new GameController(gameBoard, null, blackAI, temp);
+                gameController.makeMove();
+            }
+        });
+        this.add(player_vs_ai);
+
+        this.repaint();
     }
 
     private void drawBoard(Graphics g){

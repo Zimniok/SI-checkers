@@ -30,6 +30,7 @@ public class GameBoard {
         if (this.availableCapturesCount == 0)
             this.calculateAvailableMoves();
         System.out.println(this.evaluate());
+
     }
 
     public GameBoard(GameBoard gameBoard){
@@ -41,6 +42,16 @@ public class GameBoard {
         }
 
         this.calculateAvailableCaptures(null);
+        if (this.availableCapturesCount == 0)
+            this.calculateAvailableMoves();
+    }
+
+    public void change(GameBoard gameBoard){
+        this.availableCaptures = gameBoard.availableCaptures;
+        this.currentMove = gameBoard.currentMove;
+        this.gamePieces = gameBoard.gamePieces;
+        this.availableCapturesCount = gameBoard.availableCapturesCount;
+
         if (this.availableCapturesCount == 0)
             this.calculateAvailableMoves();
     }
@@ -136,9 +147,9 @@ public class GameBoard {
             if (p.getColor() == this.getCurrentColorToMove()) {
                 if (availableCaptures.size() == 0) {
                     availableCaptures = new ArrayList<>();
-                    availableCaptures.add(calculateCapturesFromPosition(p.getPosX(), p.getPosY(), p.getColor(), new ArrayList<>(), p.getType()));
+                    availableCaptures.add(calculateCapturesFromPosition(p.getPosX(), p.getPosY(), p.getColor(), new ArrayList<>(), p.getType(), p));
                 } else {
-                    Tree<Pair<Integer, Integer>> temp = calculateCapturesFromPosition(p.getPosX(), p.getPosY(), p.getColor(), new ArrayList<>(), p.getType());
+                    Tree<Pair<Integer, Integer>> temp = calculateCapturesFromPosition(p.getPosX(), p.getPosY(), p.getColor(), new ArrayList<>(), p.getType(), p);
                     if (temp.calculateDepthFromNode(temp.getNode()) > availableCaptures.get(0).calculateDepthFromNode(availableCaptures.get(0).getNode())) {
                         availableCaptures.clear();
                         availableCaptures.add(temp);
@@ -161,7 +172,7 @@ public class GameBoard {
 
     }
 
-    private Tree<Pair<Integer, Integer>> calculateCapturesFromPosition(int posX, int posY, int color, ArrayList<GamePiece> gamePiecesTaken, int type) {
+    private Tree<Pair<Integer, Integer>> calculateCapturesFromPosition(int posX, int posY, int color, ArrayList<GamePiece> gamePiecesTaken, int type, GamePiece king) {
         Tree<Pair<Integer, Integer>> allAvailableCaptures = new Tree<>(new Pair<>(posX, posY));
         if(type == GamePiece.MAN) {
             if (isWithinBoard(posX - 2, posY - 2) && this.getPiece(posX - 1, posY - 1) != null && !gamePiecesTaken.contains((this.getPiece(posX - 1, posY - 1))) && color != this.getPiece(posX - 1, posY - 1).getColor() && this.getPiece(posX - 2, posY - 2) == null) {
@@ -189,7 +200,7 @@ public class GameBoard {
             while (isWithinBoard(++tempX+1, ++tempY+1)){
                 if(this.getPiece(tempX, tempY) != null && this.getPiece(tempX+1, tempY+1) == null && this.getPiece(tempX, tempY).getColor() != color && !gamePiecesTaken.contains(this.getPiece(tempX, tempY))) {
                     gamePiecesTaken.add(this.getPiece(tempX, tempY));
-                    addAvailableCapturesKing(tempX, tempY, allAvailableCaptures, color, gamePiecesTaken, type, new Pair<>(1, 1));
+                    addAvailableCapturesKing(tempX, tempY, allAvailableCaptures, color, gamePiecesTaken, type, new Pair<>(1, 1), king);
                     gamePiecesTaken.remove(this.getPiece(tempX, tempY));
                     break;
                 }
@@ -199,7 +210,7 @@ public class GameBoard {
             while (isWithinBoard(--tempX-1, ++tempY+1)){
                 if(this.getPiece(tempX, tempY) != null && this.getPiece(tempX-1, tempY+1) == null && this.getPiece(tempX, tempY).getColor() != color && !gamePiecesTaken.contains(this.getPiece(tempX, tempY))) {
                     gamePiecesTaken.add(this.getPiece(tempX, tempY));
-                    addAvailableCapturesKing(tempX, tempY, allAvailableCaptures, color, gamePiecesTaken, type, new Pair<>(-1, 1));
+                    addAvailableCapturesKing(tempX, tempY, allAvailableCaptures, color, gamePiecesTaken, type, new Pair<>(-1, 1), king);
                     gamePiecesTaken.remove(this.getPiece(tempX, tempY));
                     break;
                 }
@@ -209,7 +220,7 @@ public class GameBoard {
             while (isWithinBoard(++tempX+1, --tempY-1)){
                 if(this.getPiece(tempX, tempY) != null && this.getPiece(tempX+1, tempY-1) == null && this.getPiece(tempX, tempY).getColor() != color && !gamePiecesTaken.contains(this.getPiece(tempX, tempY))) {
                     gamePiecesTaken.add(this.getPiece(tempX, tempY));
-                    addAvailableCapturesKing(tempX, tempY, allAvailableCaptures, color, gamePiecesTaken, type, new Pair<>(1, -1));
+                    addAvailableCapturesKing(tempX, tempY, allAvailableCaptures, color, gamePiecesTaken, type, new Pair<>(1, -1), king);
                     gamePiecesTaken.remove(this.getPiece(tempX, tempY));
                     break;
                 }
@@ -219,7 +230,7 @@ public class GameBoard {
             while (isWithinBoard(--tempX-1, --tempY-1)){
                 if(this.getPiece(tempX, tempY) != null && this.getPiece(tempX-1, tempY-1) == null && this.getPiece(tempX, tempY).getColor() != color && !gamePiecesTaken.contains(this.getPiece(tempX, tempY))) {
                     gamePiecesTaken.add(this.getPiece(tempX, tempY));
-                    addAvailableCapturesKing(tempX, tempY, allAvailableCaptures, color, gamePiecesTaken, type, new Pair<>(-1, -1));
+                    addAvailableCapturesKing(tempX, tempY, allAvailableCaptures, color, gamePiecesTaken, type, new Pair<>(-1, -1), king);
                     gamePiecesTaken.remove(this.getPiece(tempX, tempY));
                     break;
                 }
@@ -245,7 +256,7 @@ public class GameBoard {
         Tree<Pair<Integer, Integer>> child = new Tree<>(new Pair<>(posX, posY));
         allAvailableCaptures.addChild(child.getNode());
 
-        ArrayList<Tree.Node<Pair<Integer, Integer>>> childrenList = new ArrayList<>(calculateCapturesFromPosition(posX, posY, color, gamePieces, type).getChildren());
+        ArrayList<Tree.Node<Pair<Integer, Integer>>> childrenList = new ArrayList<>(calculateCapturesFromPosition(posX, posY, color, gamePieces, type, null).getChildren());
 
         for (Tree.Node<Pair<Integer, Integer>> pairNode : childrenList) {
             child.addChild(pairNode);
@@ -253,16 +264,21 @@ public class GameBoard {
         this.availableCapturesCount++;
     }
 
-    private void addAvailableCapturesKing(int posX, int posY, Tree<Pair<Integer, Integer>> allAvailableCaptures, int color, ArrayList<GamePiece> gamePieces, int type, Pair<Integer, Integer> vector){
+    private void addAvailableCapturesKing(int posX, int posY, Tree<Pair<Integer, Integer>> allAvailableCaptures, int color, ArrayList<GamePiece> gamePieces, int type, Pair<Integer, Integer> vector, GamePiece king){
         Tree<Pair<Integer, Integer>> child;
         ArrayList<Tree.Node<Pair<Integer, Integer>>> childrenList;
         posX += vector.getKey();
         posY += vector.getValue();
         while(this.isWithinBoard(posX, posY) && this.getPiece(posX, posY) == null){
+            if (posX == king.getPosX()) {
+                posX += vector.getKey();
+                posY += vector.getValue();
+                continue;
+            }
             child = new Tree<>(new Pair<>(posX, posY));
             allAvailableCaptures.addChild(child.getNode());
 
-            childrenList = new ArrayList<>(calculateCapturesFromPosition(posX, posY, color, gamePieces, type).getChildren());
+            childrenList = new ArrayList<>(calculateCapturesFromPosition(posX, posY, color, gamePieces, type, king).getChildren());
             for (Tree.Node<Pair<Integer, Integer>> pairNode : childrenList) {
                 child.addChild(pairNode);
             }
