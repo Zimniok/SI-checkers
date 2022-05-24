@@ -13,10 +13,16 @@ public class AIPlayer {
     }
 
     public void makeMove(GameBoard gameBoard){
+        long deltaTime = System.currentTimeMillis();
         if(this.type == MINIMAX){
             GameBoard nextState = Engine.startMinMax(gameBoard, depth);
             gameBoard.change(nextState);
         }
+        else if(this.type == ALFABETA){
+            GameBoard nextState = Engine.startAlphaBeta(gameBoard, depth);
+            gameBoard.change(nextState);
+        }
+        deltaTime = System.currentTimeMillis() - deltaTime;
     }
 
     public int getType() {
