@@ -32,7 +32,7 @@ public class GameController {
                     BufferedWriter bw = new BufferedWriter(fw);
 
                     //game status,white ai type,black ai type,eval type,depth white,depth black,game length,moves
-                    bw.append(String.join(",", String.valueOf(gameState), String.valueOf(whiteAI.getType()),
+                    bw.append(String.join(";", String.valueOf(gameState), String.valueOf(whiteAI.getType()),
                             String.valueOf(blackAI.getType()), String.valueOf(evalType), String.valueOf(whiteAI.getDepth()),
                             String.valueOf(blackAI.getDepth()), String.valueOf(avgTime), String.valueOf(gameBoard.getCurrentMove())));
                     bw.newLine();

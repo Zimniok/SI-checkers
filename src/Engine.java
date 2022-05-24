@@ -2,6 +2,7 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 public class Engine {
     public static GameBoard startAlphaBeta(GameBoard gameBoard, int depth){
@@ -190,6 +191,28 @@ public class Engine {
         if(node.getParent() == null)
             return;
         setBestValueForParent(node);
+    }
+
+    public static GameBoard randomMove(GameBoard gameBoard){
+        ArrayList<GameBoard> firstKids = new ArrayList<>();
+        for (GamePiece gamePiece: gameBoard.getGamePieces()){
+            if(gamePiece.getColor() == gameBoard.getCurrentColorToMove()){
+                for (Pair<Integer, Integer> move: gamePiece.getAvailableMoves()){
+                    GameBoard nextState = new GameBoard(gameBoard);
+                    GamePiece nextStatePiece = nextState.getPiece(gamePiece.getPosX(), gamePiece.getPosY());
+                    Pair<Integer, Integer> beforeMovePos = new Pair<>(nextStatePiece.getPosX(), nextStatePiece.getPosY());
+                    nextStatePiece.move(move.getKey(), move.getValue());
+                    if(gameBoard.getAvailableCapturesCount() > 0) {
+                        nextState.capture(beforeMovePos, move, nextStatePiece);
+                    }else {
+                        nextState.afterMoveCalculations(nextStatePiece);
+                    }
+                    firstKids.add(nextState);
+                }
+            }
+        }
+        Random r = new Random();
+        return firstKids.get(r.nextInt(firstKids.size()));
     }
 
     private static void setBestValueForParent(Tree.Node<Pair<Double, Integer>> node) {

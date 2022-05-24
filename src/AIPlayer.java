@@ -14,6 +14,8 @@ public class AIPlayer {
     }
 
     public void makeMove(GameBoard gameBoard){
+        if(gameBoard.getCurrentMove() == 0)
+            gameBoard.change(Engine.randomMove(gameBoard));
         if(this.type == MINIMAX){
             GameBoard nextState = Engine.startMinMax(gameBoard, depth);
             gameBoard.change(nextState);
