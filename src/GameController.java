@@ -12,6 +12,8 @@ public class GameController {
     }
 
     public void makeMove(){
+        if(gameBoard.checkGameState() != gameBoard.GAME_IN_PROGRESS)
+            return;
         if (gameBoard.getCurrentColorToMove() == GamePiece.WHITE && whiteAI != null){
             whiteAI.makeMove(gameBoard);
             gameGui.repaint();

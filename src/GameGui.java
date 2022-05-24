@@ -19,7 +19,7 @@ public class GameGui extends JFrame {
     GameBoard gameBoard;
     GameController gameController;
     AIPlayer whiteAI = new AIPlayer(AIPlayer.MINIMAX, 4, GamePiece.WHITE);
-    AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 4, GamePiece.BLACK);
+    AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 5, GamePiece.BLACK);
 
     JFrame f;
     GameGui(){

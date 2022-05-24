@@ -29,7 +29,6 @@ public class GameBoard {
         this.calculateAvailableCaptures(null);
         if (this.availableCapturesCount == 0)
             this.calculateAvailableMoves();
-        System.out.println(this.evaluate());
 
     }
 
@@ -133,7 +132,6 @@ public class GameBoard {
             System.out.println("Stalemate");
         }
 
-        System.out.println(this.evaluate());
     }
 
     private void calculateAvailableCaptures(GamePiece piece) {

@@ -1,6 +1,7 @@
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Engine {
     public static GameBoard startMinMax(GameBoard gameBoard, int depth){
@@ -17,10 +18,7 @@ public class Engine {
                     }else {
                         nextState.afterMoveCalculations(nextStatePiece);
                     }
-                    Tree<Pair<Double, Integer>> gameTree = new Tree<>(new Pair<>(null, nextState.getCurrentColorToMove()));
-                    populateTree(gameTree.getNode(), depth, (nextState.getCurrentColorToMove() + 1) % 2, nextState);
-                    minMax(gameTree.getNode());
-                    firstKids.add(new Pair<>(nextState, gameTree.getNode().data.getKey()));
+                    firstKids.add(new Pair<>(nextState, minmax(nextState, depth, gameBoard.getCurrentColorToMove())));
                 }
             }
         }
@@ -46,6 +44,44 @@ public class Engine {
 //        }
 //
 //        return children.get(0).data.getKey();
+    }
+
+    public static double minmax(GameBoard gameBoard, int depth, int lastMoveColor){
+        ArrayList<Double> evaluations = new ArrayList<>();
+        if(gameBoard.getCurrentColorToMove() != lastMoveColor){
+            depth --;
+        }
+        for(GamePiece gamePiece: gameBoard.getGamePieces()){
+            if (gamePiece.getColor() == gameBoard.getCurrentColorToMove()){
+                for (Pair<Integer, Integer> move: gamePiece.getAvailableMoves()) {
+                    GameBoard nextState = new GameBoard(gameBoard);
+                    GamePiece nextStatePiece = nextState.getPiece(gamePiece.getPosX(), gamePiece.getPosY());
+                    Pair<Integer, Integer> beforeMovePos = new Pair<>(nextStatePiece.getPosX(), nextStatePiece.getPosY());
+                    nextStatePiece.move(move.getKey(), move.getValue());
+                    if(gameBoard.getAvailableCapturesCount() > 0){
+                        nextState.capture(beforeMovePos, move, nextStatePiece);
+                    } else {
+                        nextState.afterMoveCalculations(nextStatePiece);
+                    }
+                    int gameState = nextState.checkGameState();
+                    if(gameState == GameBoard.WHITE_WIN || gameState == GameBoard.BLACK_WIN || gameState == GameBoard.STALEMATE || depth <= 0){
+                        evaluations.add(nextState.evaluate());
+                        continue;
+                    }
+                    int nextLastMoveColor = lastMoveColor;
+                    if(gameBoard.getCurrentColorToMove() != lastMoveColor){
+                        nextLastMoveColor = gameBoard.getCurrentColorToMove();
+                    }
+                    evaluations.add(minmax(nextState, depth, nextLastMoveColor));
+                }
+            }
+        }
+        if(evaluations.size() == 0)
+            return gameBoard.evaluate();
+        if (lastMoveColor == GamePiece.WHITE){
+            return Collections.max(evaluations);
+        }
+        return Collections.min(evaluations);
     }
 
     public static void minMax(Tree.Node<Pair<Double, Integer>> node) {
