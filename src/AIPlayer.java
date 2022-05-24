@@ -1,3 +1,4 @@
+
 public class AIPlayer {
     public static final int MINIMAX = 0;
     public static final int ALFABETA = 1;
@@ -13,7 +14,6 @@ public class AIPlayer {
     }
 
     public void makeMove(GameBoard gameBoard){
-        long deltaTime = System.currentTimeMillis();
         if(this.type == MINIMAX){
             GameBoard nextState = Engine.startMinMax(gameBoard, depth);
             gameBoard.change(nextState);
@@ -22,7 +22,6 @@ public class AIPlayer {
             GameBoard nextState = Engine.startAlphaBeta(gameBoard, depth);
             gameBoard.change(nextState);
         }
-        deltaTime = System.currentTimeMillis() - deltaTime;
     }
 
     public int getType() {

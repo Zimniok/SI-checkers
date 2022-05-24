@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class GameGui extends JFrame {
+    public static int WRONG_EVAL = 0;
+
     boolean drawGame = false;
     boolean selected = false;
     int selectedX;
@@ -20,9 +22,12 @@ public class GameGui extends JFrame {
     GameController gameController;
     AIPlayer whiteAI = new AIPlayer(AIPlayer.MINIMAX, 4, GamePiece.WHITE);
     AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 5, GamePiece.BLACK);
+    int evalType;
 
     JFrame f;
-    GameGui(){
+    GameGui(int evalType){
+        this.evalType = evalType;
+
         setTitle("Checkers");
         try {
             setIconImage(ImageIO.read(new File("./img/white_king.png" )));
@@ -147,7 +152,7 @@ public class GameGui extends JFrame {
                 drawGame = true;
                 repaint(1);
 
-                gameController = new GameController(gameBoard, whiteAI, blackAI, temp);
+                gameController = new GameController(gameBoard, whiteAI, blackAI, temp, evalType);
             }
         });
         this.add(whiteAIConfig);
@@ -163,7 +168,7 @@ public class GameGui extends JFrame {
                 drawGame = true;
                 repaint();
 
-                gameController = new GameController(gameBoard, whiteAI, null, temp);
+                gameController = new GameController(gameBoard, whiteAI, null, temp, evalType);
             }
         });
         this.add(ai_vs_player);
@@ -179,7 +184,7 @@ public class GameGui extends JFrame {
                 drawGame = true;
                 repaint();
 
-                gameController = new GameController(gameBoard, null, blackAI, temp);
+                gameController = new GameController(gameBoard, null, blackAI, temp, evalType);
             }
         });
         this.add(player_vs_ai);
@@ -215,8 +220,7 @@ public class GameGui extends JFrame {
             this.drawBoard(g);
             this.drawPieces(g);
             int state = gameBoard.checkGameState();
-            if(gameController!=null && state == gameBoard.GAME_IN_PROGRESS)
-                gameController.makeMove();
+            gameController.makeMove();
             if(state != gameBoard.GAME_IN_PROGRESS) {
                 String message = "";
                 if(state == GameBoard.WHITE_WIN)
