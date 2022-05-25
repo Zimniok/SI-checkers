@@ -20,8 +20,8 @@ public class GameGui extends JFrame {
     int offsetX = 20;
     GameBoard gameBoard;
     GameController gameController;
-    AIPlayer whiteAI = new AIPlayer(AIPlayer.MINIMAX, 4, GamePiece.WHITE);
-    AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 5, GamePiece.BLACK);
+    AIPlayer whiteAI = new AIPlayer(AIPlayer.MINIMAX, 6, GamePiece.WHITE);
+    AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 6, GamePiece.BLACK);
     int evalType;
 
     JFrame f;
@@ -121,8 +121,11 @@ public class GameGui extends JFrame {
     }
 
     private void printMenu() {
+        drawGame = false;
         this.setTitle("Checkers Main Menu");
         JPanel jPanel = new JPanel();
+        jPanel.setVisible(false);
+        this.setVisible(false);
 
         JButton startButton = new JButton("Start");
         startButton.setBounds(320, 300, 200, 50);
@@ -130,6 +133,7 @@ public class GameGui extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                jPanel.setVisible(false);
                 setTitle("Checkers game");
                 resetWindow();
                 gameBoard = new GameBoard();
@@ -139,13 +143,14 @@ public class GameGui extends JFrame {
                 AIGui aiGui = new AIGui(temp);
             }
         });
-        this.add(startButton);
+        jPanel.add(startButton);
 
         JButton whiteAIConfig = new JButton("AI vs AI");
         whiteAIConfig.setBounds(320, 400, 200, 50);
         whiteAIConfig.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                jPanel.setVisible(false);
                 setTitle("Checkers game");
                 resetWindow();
                 gameBoard = new GameBoard();
@@ -155,13 +160,14 @@ public class GameGui extends JFrame {
                 gameController = new GameController(gameBoard, whiteAI, blackAI, temp, evalType);
             }
         });
-        this.add(whiteAIConfig);
+        jPanel.add(whiteAIConfig);
 
         JButton ai_vs_player = new JButton("AI vs Player");
         ai_vs_player.setBounds(320, 500, 200, 50);
         ai_vs_player.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                jPanel.setVisible(false);
                 setTitle("Checkers game");
                 resetWindow();
                 gameBoard = new GameBoard();
@@ -171,13 +177,14 @@ public class GameGui extends JFrame {
                 gameController = new GameController(gameBoard, whiteAI, null, temp, evalType);
             }
         });
-        this.add(ai_vs_player);
+        jPanel.add(ai_vs_player);
 
         JButton player_vs_ai = new JButton("Player vs AI");
         player_vs_ai.setBounds(320, 600, 200, 50);
         player_vs_ai.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                jPanel.setVisible(false);
                 setTitle("Checkers game");
                 resetWindow();
                 gameBoard = new GameBoard();
@@ -187,12 +194,19 @@ public class GameGui extends JFrame {
                 gameController = new GameController(gameBoard, null, blackAI, temp, evalType);
             }
         });
-        this.add(player_vs_ai);
-
+        jPanel.add(player_vs_ai);
+        this.add(jPanel);
+        jPanel.setVisible(true);
         this.repaint();
+        this.setVisible(true);
+        this.revalidate();
+
     }
 
     private void drawBoard(Graphics g){
+        g.setColor(Color.WHITE);
+        g.fillRect(0,0, this.getWidth(), this.getHeight());
+        g.setColor(Color.BLACK);
         g.drawRect(offsetX-1, offsetY-1, boardTileSize*8+1, boardTileSize*8+1);
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
@@ -220,7 +234,8 @@ public class GameGui extends JFrame {
             this.drawBoard(g);
             this.drawPieces(g);
             int state = gameBoard.checkGameState();
-            gameController.makeMove();
+            if (gameController!=null)
+                gameController.makeMove();
             if(state != gameBoard.GAME_IN_PROGRESS) {
                 String message = "";
                 if(state == GameBoard.WHITE_WIN)
@@ -229,7 +244,11 @@ public class GameGui extends JFrame {
                     message = "Black won!";
                 else if(state == GameBoard.STALEMATE)
                     message = "Stalemate!";
-                JOptionPane.showMessageDialog(null, message);
+//                JOptionPane.showMessageDialog(null, message);
+                int input = JOptionPane.showConfirmDialog(null, message);
+                if(input == JOptionPane.OK_OPTION){
+                    printMenu();
+                }
             }
         }
     }

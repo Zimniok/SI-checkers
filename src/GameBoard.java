@@ -446,7 +446,7 @@ public class GameBoard {
             return BLACK_WIN;
         else if(available_moves == 0)
             return WHITE_WIN;
-        if(this.kingMoves == 30)
+        if(this.kingMoves >= 30)
             return STALEMATE;
         return GAME_IN_PROGRESS;
     }
