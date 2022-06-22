@@ -22,7 +22,7 @@ public class AIGui extends JFrame {
         showButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GameBoard gameBoardToShow = Engine.startMinMax(gameGui.gameBoard, 5);
+                GameBoard gameBoardToShow = Engine.startMinMax(gameGui.gameBoard, 5, GameGui.WRONG_EVAL);
                 GameBoardPreview gameBoardPreview = new GameBoardPreview(gameBoardToShow);
             }
         });
@@ -32,7 +32,7 @@ public class AIGui extends JFrame {
         makeMoveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GameBoard gameBoardToShow = Engine.startMinMax(gameGui.gameBoard, 5);
+                GameBoard gameBoardToShow = Engine.startMinMax(gameGui.gameBoard, 5, GameGui.WRONG_EVAL);
                 gameGui.gameBoard = gameBoardToShow;
                 gameGui.repaint();
                 System.out.println(gameGui.gameBoard.getCurrentMove());
@@ -44,7 +44,7 @@ public class AIGui extends JFrame {
         showAB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GameBoard gameBoardToShow = Engine.startAlphaBeta(gameGui.gameBoard, 5);
+                GameBoard gameBoardToShow = Engine.startAlphaBeta(gameGui.gameBoard, 5, GameGui.WRONG_EVAL);
                 GameBoardPreview gameBoardPreview = new GameBoardPreview(gameBoardToShow);
             }
         });

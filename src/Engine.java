@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Random;
 
 public class Engine {
-    public static GameBoard startAlphaBeta(GameBoard gameBoard, int depth){
+    public static GameBoard startAlphaBeta(GameBoard gameBoard, int depth, int evaluationType){
         double alpha = Double.MIN_VALUE;
         double beta = Double.MAX_VALUE;
         ArrayList<Pair<GameBoard, Double>> firstKids = new ArrayList<>();
@@ -25,7 +25,7 @@ public class Engine {
                         alpha = firstKids.get(firstKids.size()-1).getValue();
                     else if(gameBoard.getCurrentColorToMove() == GamePiece.BLACK && firstKids.size() > 0 && firstKids.get(firstKids.size()-1).getValue() < beta)
                         beta = firstKids.get(firstKids.size()-1).getValue();
-                    double bestChildEval = alphaBeta(nextState, depth, gameBoard.getCurrentColorToMove(), alpha, beta);
+                    double bestChildEval = alphaBeta(nextState, depth, gameBoard.getCurrentColorToMove(), alpha, beta, evaluationType);
 
                     firstKids.add(new Pair<>(nextState, bestChildEval));
 
@@ -52,7 +52,7 @@ public class Engine {
         return firstKids.get(bestValuePos).getKey();
     }
 
-    private static double alphaBeta(GameBoard gameBoard, int depth, int lastMoveColor, double alpha, double beta){
+    private static double alphaBeta(GameBoard gameBoard, int depth, int lastMoveColor, double alpha, double beta, int evaluationType){
         ArrayList<Double> evaluations = new ArrayList<>();
         if(gameBoard.getCurrentColorToMove() != lastMoveColor){
             depth --;
@@ -71,7 +71,7 @@ public class Engine {
                     }
                     int gameState = nextState.checkGameState();
                     if(gameState == GameBoard.WHITE_WIN || gameState == GameBoard.BLACK_WIN || gameState == GameBoard.STALEMATE || depth <= 0){
-                        evaluations.add(nextState.evaluate());
+                        evaluations.add(nextState.evaluate(evaluationType));
                         continue;
                     }
                     int nextLastMoveColor = lastMoveColor;
@@ -82,7 +82,7 @@ public class Engine {
                         alpha = evaluations.get(evaluations.size()-1);
                     else if(lastMoveColor == GamePiece.BLACK && evaluations.size() > 0 && evaluations.get(evaluations.size()-1) < beta)
                         beta = evaluations.get(evaluations.size()-1);
-                    double bestChildEval = alphaBeta(nextState, depth, nextLastMoveColor, alpha, beta);
+                    double bestChildEval = alphaBeta(nextState, depth, nextLastMoveColor, alpha, beta, evaluationType);
                     evaluations.add(bestChildEval);
                     if(lastMoveColor == GamePiece.WHITE && bestChildEval > beta){
                         break;
@@ -93,14 +93,14 @@ public class Engine {
             }
         }
         if(evaluations.size() == 0)
-            return gameBoard.evaluate();
+            return gameBoard.evaluate(evaluationType);
         if (lastMoveColor == GamePiece.WHITE){
             return Collections.max(evaluations);
         }
         return Collections.min(evaluations);
     }
 
-    public static GameBoard startMinMax(GameBoard gameBoard, int depth){
+    public static GameBoard startMinMax(GameBoard gameBoard, int depth, int evaluationType){
         ArrayList<Pair<GameBoard, Double>> firstKids = new ArrayList<>();
         for (GamePiece gamePiece: gameBoard.getGamePieces()){
             if(gamePiece.getColor() == gameBoard.getCurrentColorToMove()){
@@ -114,7 +114,7 @@ public class Engine {
                     }else {
                         nextState.afterMoveCalculations(nextStatePiece);
                     }
-                    firstKids.add(new Pair<>(nextState, minmax(nextState, depth, gameBoard.getCurrentColorToMove())));
+                    firstKids.add(new Pair<>(nextState, minmax(nextState, depth, gameBoard.getCurrentColorToMove(), evaluationType)));
                 }
             }
         }
@@ -142,7 +142,7 @@ public class Engine {
 //        return children.get(0).data.getKey();
     }
 
-    public static double minmax(GameBoard gameBoard, int depth, int lastMoveColor){
+    public static double minmax(GameBoard gameBoard, int depth, int lastMoveColor, int evaluationType){
         ArrayList<Double> evaluations = new ArrayList<>();
         if(gameBoard.getCurrentColorToMove() != lastMoveColor){
             depth --;
@@ -161,19 +161,19 @@ public class Engine {
                     }
                     int gameState = nextState.checkGameState();
                     if(gameState == GameBoard.WHITE_WIN || gameState == GameBoard.BLACK_WIN || gameState == GameBoard.STALEMATE || depth <= 0){
-                        evaluations.add(nextState.evaluate());
+                        evaluations.add(nextState.evaluate(evaluationType));
                         continue;
                     }
                     int nextLastMoveColor = lastMoveColor;
                     if(gameBoard.getCurrentColorToMove() != lastMoveColor){
                         nextLastMoveColor = gameBoard.getCurrentColorToMove();
                     }
-                    evaluations.add(minmax(nextState, depth, nextLastMoveColor));
+                    evaluations.add(minmax(nextState, depth, nextLastMoveColor, evaluationType));
                 }
             }
         }
         if(evaluations.size() == 0)
-            return gameBoard.evaluate();
+            return gameBoard.evaluate(evaluationType);
         if (lastMoveColor == GamePiece.WHITE){
             return Collections.max(evaluations);
         }
@@ -232,70 +232,6 @@ public class Engine {
 //        } else {
 //            if (node.getParent().data.getValue() == null || node.data.getKey().getEvaluation() < node.getParent().data.getValue()){
 //                node.getParent().data = new Pair<>(node.getParent().data.getKey(), node.data.getKey().getEvaluation());
-//            }
-//        }
-    }
-
-    private static void populateTree(Tree.Node<Pair<Double, Integer>> node, int depth, int lastMoveColor, GameBoard gameBoard){
-        if(gameBoard.getCurrentColorToMove() != lastMoveColor){
-            lastMoveColor = gameBoard.getCurrentColorToMove();
-            depth --;
-        }
-        for(GamePiece gamePiece: gameBoard.getGamePieces()){
-            if (gamePiece.getColor() == gameBoard.getCurrentColorToMove()){
-                for (Pair<Integer, Integer> move: gamePiece.getAvailableMoves()) {
-                    GameBoard nextState = new GameBoard(gameBoard);
-                    GamePiece nextStatePiece = nextState.getPiece(gamePiece.getPosX(), gamePiece.getPosY());
-                    Pair<Integer, Integer> beforeMovePos = new Pair<>(nextStatePiece.getPosX(), nextStatePiece.getPosY());
-                    nextStatePiece.move(move.getKey(), move.getValue());
-                    if(gameBoard.getAvailableCapturesCount() > 0){
-                        nextState.capture(beforeMovePos, move, nextStatePiece);
-                    } else {
-                        nextState.afterMoveCalculations(nextStatePiece);
-                    }
-                    Tree.Node<Pair<Double, Integer>> child = new Tree.Node<>();
-                    child.data = new Pair<>(null, nextState.getCurrentColorToMove());
-                    node.addChild(child);
-                    int gameState = nextState.checkGameState();
-                    if(gameState == GameBoard.WHITE_WIN || gameState == GameBoard.BLACK_WIN || gameState == GameBoard.STALEMATE || depth <= 0){
-                        child.data = new Pair<>(nextState.evaluate(), nextState.getCurrentColorToMove());
-                        continue;
-                    }
-                    populateTree(child, depth, lastMoveColor, nextState);
-                }
-            }
-        }
-
-//        for (GamePiece gamePiece: node.data.getKey().getGamePieces()){
-//            if (gamePiece.getColor() != lastMoveColor){
-//                lastMoveColor = gamePiece.getColor();
-//                depth --;
-//            }
-//            if (gamePiece.getColor() == node.data.getKey().getCurrentColorToMove()) {
-//                for (Pair<Integer, Integer> move : gamePiece.getAvailableMoves()) {
-//                    GameBoard nextState = new GameBoard(node.data.getKey());
-//                    GamePiece nextStatePiece = nextState.getPiece(gamePiece.getPosX(), gamePiece.getPosY());
-//                    Pair<Integer, Integer> beforeMovePos = new Pair<>(nextStatePiece.getPosX(), nextStatePiece.getPosY());
-//                    nextStatePiece.move(move.getKey(), move.getValue());
-//                    if(node.data.getKey().getAvailableCapturesCount() > 0) {
-//                        nextState.capture(beforeMovePos, move, nextStatePiece);
-//                    }else {
-//                        nextState.afterMoveCalculations(nextStatePiece);
-//                    }
-////                    if(node.data.getKey().getAvailableCapturesCount() > 0) {
-////                        nextState.addCurrentMove();
-////                        nextState.afterMoveCalculations(null);
-////                    }
-//                    Tree.Node<Pair<GameBoard, Double>> child = new Tree.Node<>();
-//                    child.data = new Pair<GameBoard,Double>(nextState, null);
-//                    node.addChild(child);
-//                    int gameState = nextState.checkGameState();
-//                    if(gameState == GameBoard.WHITE_WIN || gameState == GameBoard.BLACK_WIN || gameState == GameBoard.STALEMATE || depth <= 0) {
-//                        child.data = new Pair<>(nextState, nextState.evaluate());
-//                        continue;
-//                    }
-//                    populateTree(child, depth, lastMoveColor);
-//                }
 //            }
 //        }
     }

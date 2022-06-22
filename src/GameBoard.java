@@ -451,7 +451,7 @@ public class GameBoard {
         return GAME_IN_PROGRESS;
     }
 
-    public double evaluate(){
+    public double evaluate(int evaluationType){
         double score = 0.0;
 
         if(checkGameState() == WHITE_WIN)
@@ -463,33 +463,49 @@ public class GameBoard {
             if(piece.getColor() == GamePiece.WHITE) {
                 if(piece.getType() == GamePiece.MAN) {
                     score++;
-                    score += (7-piece.getPosY())/10.0;
+                    if(evaluationType == GameGui.WRONG_EVAL || evaluationType == GameGui.OUTSIDE_BETTER)
+                        score += (7-piece.getPosY())/10.0;
                 }
                 else {
                     score += 3;
                 }
 
-
-                if (piece.getPosX() > 1 && piece.getPosX() < 6){
-                    score += (7-piece.getPosY())/5.0;
-                } else if (piece.getPosX() > 0 && piece.getPosX() < 7){
-                    score += (7-piece.getPosY())/10.0;
+                if (evaluationType == GameGui.WRONG_EVAL) {
+                    if (piece.getPosX() > 1 && piece.getPosX() < 6) {
+                        score += (7 - piece.getPosY()) / 5.0;
+                    } else if (piece.getPosX() > 0 && piece.getPosX() < 7) {
+                        score += (7 - piece.getPosY()) / 10.0;
+                    }
+                } else if(evaluationType == GameGui.OUTSIDE_BETTER){
+                    if (piece.getPosX() == 0 && piece.getPosX() == 7) {
+                        score += (7 - piece.getPosY()) / 5.0;
+                    } else if (piece.getPosX() == 1 && piece.getPosX() == 6) {
+                        score += (7 - piece.getPosY()) / 10.0;
+                    }
                 }
             }
             else {
                 if (piece.getType() == GamePiece.MAN) {
                     score--;
-                    score -= piece.getPosY()/10.0;
+                    if(evaluationType == GameGui.WRONG_EVAL || evaluationType == GameGui.OUTSIDE_BETTER)
+                        score -= piece.getPosY()/10.0;
                 }
                 else {
                     score -= 3;
                 }
 
-
-                if (piece.getPosX() > 1 && piece.getPosX() < 6){
-                    score -= piece.getPosY()/5.0;
-                } else if (piece.getPosX() > 0 && piece.getPosX() < 7){
-                    score -= piece.getPosY()/10.0;
+                if (evaluationType == GameGui.WRONG_EVAL) {
+                    if (piece.getPosX() > 1 && piece.getPosX() < 6) {
+                        score -= piece.getPosY() / 5.0;
+                    } else if (piece.getPosX() > 0 && piece.getPosX() < 7) {
+                        score -= piece.getPosY() / 10.0;
+                    }
+                } else if(evaluationType == GameGui.OUTSIDE_BETTER){
+                    if (piece.getPosX() == 0 && piece.getPosX() == 7) {
+                        score -= piece.getPosY() / 5.0;
+                    } else if (piece.getPosX() == 1 && piece.getPosX() == 6) {
+                        score -= piece.getPosY() / 10.0;
+                    }
                 }
             }
             score = Math.round(score*10)/10.0;

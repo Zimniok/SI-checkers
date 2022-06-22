@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class GameGui extends JFrame {
     public static int WRONG_EVAL = 0;
+    public static int OUTSIDE_BETTER = 1;
+    public static int ONLY_COUNT = 2;
 
     boolean drawGame = false;
     boolean selected = false;
@@ -20,8 +22,8 @@ public class GameGui extends JFrame {
     int offsetX = 20;
     GameBoard gameBoard;
     GameController gameController;
-    AIPlayer whiteAI = new AIPlayer(AIPlayer.MINIMAX, 6, GamePiece.WHITE);
-    AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 6, GamePiece.BLACK);
+    AIPlayer whiteAI = new AIPlayer(AIPlayer.MINIMAX, 6, GamePiece.WHITE, WRONG_EVAL);
+    AIPlayer blackAI = new AIPlayer(AIPlayer.MINIMAX, 6, GamePiece.BLACK, OUTSIDE_BETTER);
     int evalType;
 
     JFrame f;

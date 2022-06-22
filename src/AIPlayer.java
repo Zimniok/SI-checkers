@@ -6,22 +6,24 @@ public class AIPlayer {
     private int type;
     private int depth;
     private int color;
+    private int evaluationType;
 
-    public AIPlayer(int type, int depth, int color) {
+    public AIPlayer(int type, int depth, int color, int evaluationType) {
         this.type = type;
         this.depth = depth;
         this.color = color;
+        this.evaluationType = evaluationType;
     }
 
     public void makeMove(GameBoard gameBoard){
         if(gameBoard.getCurrentMove() == 0)
             gameBoard.change(Engine.randomMove(gameBoard));
         if(this.type == MINIMAX){
-            GameBoard nextState = Engine.startMinMax(gameBoard, depth);
+            GameBoard nextState = Engine.startMinMax(gameBoard, depth, evaluationType);
             gameBoard.change(nextState);
         }
         else if(this.type == ALFABETA){
-            GameBoard nextState = Engine.startAlphaBeta(gameBoard, depth);
+            GameBoard nextState = Engine.startAlphaBeta(gameBoard, depth, evaluationType);
             gameBoard.change(nextState);
         }
     }
@@ -48,5 +50,9 @@ public class AIPlayer {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public int getEvaluationType() {
+        return evaluationType;
     }
 }

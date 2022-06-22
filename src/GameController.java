@@ -31,9 +31,9 @@ public class GameController {
                     FileWriter fw = new FileWriter(outputFile, true);
                     BufferedWriter bw = new BufferedWriter(fw);
 
-                    //game status,white ai type,black ai type,eval type,depth white,depth black,game length,moves
+                    //game status,white ai type,black ai type,white eval type, black eval type, depth white,depth black,game length,moves
                     bw.append(String.join(";", String.valueOf(gameState), String.valueOf(whiteAI.getType()),
-                            String.valueOf(blackAI.getType()), String.valueOf(evalType), String.valueOf(whiteAI.getDepth()),
+                            String.valueOf(blackAI.getType()), String.valueOf(whiteAI.getEvaluationType()), String.valueOf(blackAI.getEvaluationType()), String.valueOf(whiteAI.getDepth()),
                             String.valueOf(blackAI.getDepth()), String.valueOf(avgTime), String.valueOf(gameBoard.getCurrentMove())));
                     bw.newLine();
                     bw.close();
@@ -49,7 +49,7 @@ public class GameController {
             whiteAI.makeMove(gameBoard);
             sumTime += System.currentTimeMillis() - deltaTime;
             gameGui.repaint();
-            this.makeMove();
+            //this.makeMove();
         } else if (gameBoard.getCurrentColorToMove() == GamePiece.BLACK && blackAI != null){
             long deltaTime = System.currentTimeMillis();
             blackAI.makeMove(gameBoard);
